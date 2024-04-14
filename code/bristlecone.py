@@ -10,7 +10,7 @@ from bristle_init import projectSetup
 
 
 def main():
-    if __name__ == '__main__':
-        projectSetup(settings.project)
+    projectSetup(settings.project)
 
-main()
+if __name__ == '__main__':
+    main()
