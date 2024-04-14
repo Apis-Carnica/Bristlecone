@@ -2,15 +2,16 @@
 
 
 import os
-import curses
+from curses import wrapper
 from pathlib import Path
 
 import settings
 from bristle_init import projectSetup
+from bristle_ui import ui
 
 
 def main():
-    projectSetup(settings.project)
+    wrapper(ui)
 
 if __name__ == '__main__':
     main()

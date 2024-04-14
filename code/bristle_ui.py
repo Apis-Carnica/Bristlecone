@@ -5,9 +5,19 @@ import curses
 from curses import wrapper
 import time
 import settings
+from bristle_init import projectSetup
 
 
 menu = ["Start a new project", "Open an existing project", "Recompile a project", "Exit"]
+
+
+def newProject(stdscr):
+    projectSetup(settings.project)
+    stdscr.clear()
+    stdscr.addstr("Setting up your project...")
+    stdscr.addstr("Press any key.")
+    stdscr.refresh()
+    stdscr.getch()
 
 
 def printMenu(stdscr, selected):
@@ -51,5 +61,3 @@ def ui(stdscr):
         printMenu(stdscr, current_row)
         curses.doupdate()
 
-
-wrapper(ui)
