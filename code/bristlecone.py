@@ -215,9 +215,16 @@ def mainUI(stdscr):
     editor = curses.newwin(curses.LINES - 15, curses.COLS - 33, 0, 0)
     editor.box()
     editor.addstr(1, editor.getmaxyx()[1] // 2 - 1, "Notes", A_REVERSE)
+    i = 3
+    file = open(f"{projectdir}/walkthrough.txt","r")
+    lines = file.read().splitlines()
+    file.close()
+    for line in lines:
+        editor.addstr(i, 2, line)
+        i += 1
 
-    infrastructure = curses.newwin(18, 30, 0, curses.COLS - 30)
-    accounts = curses.newwin(18, 30, curses.LINES - 33, curses.COLS - 30)
+    infrastructure = curses.newwin(21, 30, 0, curses.COLS - 30)
+    accounts = curses.newwin(15, 30, curses.LINES - 30, curses.COLS - 30)
 
     findings = curses.newwin(14, curses.COLS // 3 - 1, curses.LINES - 14, 0)
     #reccomendations = curses.newwin(14, 30, curses.LINES - 14, 0)
@@ -238,10 +245,19 @@ def mainUI(stdscr):
     lines = file.read().splitlines()
     file.close()
     for line in lines[1:]:
-        infrastructure.addstr(infrastructure.getyx()[0] + i, infrastructure.getyx()[1] + 2, line.split(", ")[0] + " | " + line.split(", ")[1])
-        i += 1
+        infrastructure.addstr(i, 2, line.split(", ")[0] + " | " + line.split(", ")[1])
+        infrastructure.addstr(i + 1, 2, line.split(", ")[2])
+        i += 3
 
     accounts.addstr(1, accounts.getmaxyx()[1] // 2 - 4, "Accounts", A_REVERSE)
+    i = 3
+    file = open(f"{projectdir}/accounts.csv","r")
+    lines = file.read().splitlines()
+    file.close()
+    for line in lines[1:]:
+        accounts.addstr(i, 2, line.split(", ")[2] + ":" + line.split(", ")[3])
+        accounts.addstr(i + 1, 2, line.split(", ")[1] + " -> " + line.split(", ")[0])
+        i += 3
     findings.addstr(1, findings.getmaxyx()[1] // 2 - 5, "Findings", A_REVERSE)
     objectives.addstr(1, objectives.getmaxyx()[1] // 2 - 5, "Objectives", A_REVERSE)
     task.addstr(1, task.getmaxyx()[1] // 2 - 2, "Tasks", A_REVERSE)

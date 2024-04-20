@@ -1,0 +1,7 @@
+IP, Hostname, Description
+192.168.120.110, Gary, Standalone Linux Host
+192.168.120.111, Windham, Standalone Linux Host
+192.168.120.112, Shulker, Standalone Windows Host
+192.168.120.101, MS01, AD Gateway
+172.16.120.102, MS02, AD Server
+172.16.120.103, DC01, Domain Controller
