@@ -5,7 +5,7 @@ import os
 import datetime
 from pathlib import Path
 import curses
-from curses import wrapper
+from curses import A_REVERSE, wrapper
 
 
 project = "Testing"
@@ -15,9 +15,10 @@ engagement_type = {"Black Box": False, "White Box": False, "Grey Box": False}
 engagement_scope = {"Physical": False, "Remote": False, "Full-spec": False, "Wireless": False, "Web": False, "App": False, "SocEng": False, "Rogue": False, "Inside": False, "DoS": False}
 timeline = {"from": datetime.date.today(), "to": (datetime.date.today() + datetime.timedelta(days=7)), "Status Updates": {"Daily": False, "Weekly": False, "Monthly": False, "Quarterly": False}}
 projectdir = f"/tmp/{project}"
-menu = ["Start a new project", "Open an existing project", "Recompile a project", "Exit"]
+menu = ["Start a new project", "Open an existing project", "Recompile a project", "Open compiled report", "Exit"]
 
 
+# Initialization functions
 def initTasks():
     with open(f"{projectdir}/tasks.csv","w") as file:
         file.write("Member, Description, Complete?\r\n")
@@ -72,7 +73,6 @@ def projectSetup(project: str):
         file.write("Fin")
 
 
-
 # Creation of the writeup.tex file
 def docHeader():
     with open("/tmp/Testing/writeup/writeup.tex", "w") as f:
@@ -98,7 +98,6 @@ def docHeader():
         f.write("\\definecolor{NFColor}{HTML}{F4F1DE} % Cream\n\n")
         f.write("\\author{Ursa}\n\n")
 
-
 def examTitlePage():
     with open(f"{projectdir}/writeup/writeup.tex", "a") as f:
         f.write("\\begin{document}\n")
@@ -118,7 +117,6 @@ def examTitlePage():
         f.write("\\tableofcontents\n")
         f.write("\\vfill\n")
         f.write("\\pagebreak\n\n")
-
 
 def foreword():
     with open(f"{projectdir}/writeup/writeup.tex", "a") as f:
@@ -170,7 +168,6 @@ def foreword():
         f.write("\\paragraph{}The final step of a penetration test is to clean up any interaction with the computer and remove all applications, settings, files, or other data that wasn't there before the tester's involvement. Ursa deleted all privilege escalation utilities on the computers and all temporary files in the users' home directories and the /tmp directory (C:/Users/Public on Windows machines).\n")
         f.write("\\pagebreak\n\n")
 
-
 def simpleContent():
     with open(f"{projectdir}/writeup/writeup.tex", "a") as f:
         f.write("\\section{Introduction}\n")
@@ -188,7 +185,7 @@ def simpleContent():
         f.write("\\end{document}\n")
 
 
-
+# More Utility Functions
 def compileProject(stdscr):
     docHeader()
     examTitlePage()
@@ -203,12 +200,61 @@ def compileProject(stdscr):
     if key in [curses.KEY_EXIT, 27]:
         printMenu(stdscr, 0)
 
-def mainUI(stdscr):
+def openReport(stdscr):
+    os.system(f"zathura {projectdir}/writeup/writeup.pdf")
     stdscr.clear()
-    curses.curs_set(0)
-    stdscr.addstr("Main UI\n")
+    stdscr.addstr("Opening Report.\n")
+    stdscr.addstr("Press any key.")
     stdscr.refresh()
     stdscr.getch()
+
+
+# Main UI Functions
+def mainUI(stdscr):
+    stdscr.clear()
+    editor = curses.newwin(curses.LINES - 15, curses.COLS - 33, 0, 0)
+    editor.box()
+    editor.addstr(1, editor.getmaxyx()[1] // 2 - 1, "Notes", A_REVERSE)
+
+    infrastructure = curses.newwin(18, 30, 0, curses.COLS - 30)
+    accounts = curses.newwin(18, 30, curses.LINES - 33, curses.COLS - 30)
+
+    findings = curses.newwin(14, curses.COLS // 3 - 1, curses.LINES - 14, 0)
+    #reccomendations = curses.newwin(14, 30, curses.LINES - 14, 0)
+    
+    objectives = curses.newwin(14, curses.COLS // 3 - 2, curses.LINES - 14, curses.COLS // 3 + 1)
+    task = curses.newwin(14, curses.COLS // 3 - 1, curses.LINES - 14, curses.COLS // 3 * 2 + 1)
+    #tool = curses.newwin(14, curses.COLS // 3 - 1, curses.LINES - 14, curses.COLS // 3 * 2)
+
+    objectives.box()
+    task.box()
+    #tool.box()
+    findings.box()
+    infrastructure.box()
+    accounts.box()
+    infrastructure.addstr(1, infrastructure.getmaxyx()[1] // 2 - 7, "Infrastructure", A_REVERSE)
+    i = 3
+    file = open(f"{projectdir}/infra.csv","r")
+    lines = file.read().splitlines()
+    file.close()
+    for line in lines[1:]:
+        infrastructure.addstr(infrastructure.getyx()[0] + i, infrastructure.getyx()[1] + 2, line.split(", ")[0] + " | " + line.split(", ")[1])
+        i += 1
+
+    accounts.addstr(1, accounts.getmaxyx()[1] // 2 - 4, "Accounts", A_REVERSE)
+    findings.addstr(1, findings.getmaxyx()[1] // 2 - 5, "Findings", A_REVERSE)
+    objectives.addstr(1, objectives.getmaxyx()[1] // 2 - 5, "Objectives", A_REVERSE)
+    task.addstr(1, task.getmaxyx()[1] // 2 - 2, "Tasks", A_REVERSE)
+    #tool.addstr(1, tool.getmaxyx()[1] // 2 - 2, "Tools", A_REVERSE)
+    infrastructure.refresh()
+    accounts.refresh()
+    findings.refresh()
+    objectives.refresh()
+    task.refresh()
+    #tool.refresh()
+    editor.refresh()
+    infrastructure.getch()
+
 
 def newProject(stdscr):
     projectSetup(project)
@@ -255,6 +301,8 @@ def ui(stdscr):
             elif current_row == 2:
                 compileProject(stdscr)
                 #recompile(stdscr)
+            elif current_row == 3:
+                openReport(stdscr)
             elif current_row == len(menu) - 1:
                 break
         printMenu(stdscr, current_row)
