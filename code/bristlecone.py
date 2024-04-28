@@ -227,7 +227,7 @@ def mainUI(stdscr):
     accounts = curses.newwin(15, 30, curses.LINES - 30, curses.COLS - 30)
 
     findings = curses.newwin(14, curses.COLS // 3 - 1, curses.LINES - 14, 0)
-    #reccomendations = curses.newwin(14, 30, curses.LINES - 14, 0)
+    #recommendations = curses.newwin(14, 30, curses.LINES - 14, 0)
     
     objectives = curses.newwin(14, curses.COLS // 3 - 2, curses.LINES - 14, curses.COLS // 3 + 1)
     task = curses.newwin(14, curses.COLS // 3 - 1, curses.LINES - 14, curses.COLS // 3 * 2 + 1)
@@ -239,6 +239,7 @@ def mainUI(stdscr):
     findings.box()
     infrastructure.box()
     accounts.box()
+
     infrastructure.addstr(1, infrastructure.getmaxyx()[1] // 2 - 7, "Infrastructure", A_REVERSE)
     i = 3
     file = open(f"{projectdir}/infra.csv","r")
@@ -249,6 +250,7 @@ def mainUI(stdscr):
         infrastructure.addstr(i + 1, 2, line.split(", ")[2])
         i += 3
 
+
     accounts.addstr(1, accounts.getmaxyx()[1] // 2 - 4, "Accounts", A_REVERSE)
     i = 3
     file = open(f"{projectdir}/accounts.csv","r")
@@ -258,9 +260,70 @@ def mainUI(stdscr):
         accounts.addstr(i, 2, line.split(", ")[2] + ":" + line.split(", ")[3])
         accounts.addstr(i + 1, 2, line.split(", ")[1] + " -> " + line.split(", ")[0])
         i += 3
+
+
     findings.addstr(1, findings.getmaxyx()[1] // 2 - 5, "Findings", A_REVERSE)
+    i = 3
+    file = open(f"{projectdir}/findings.csv","r")
+    lines = file.read().splitlines()
+    file.close()
+    if len(lines) >= 3:
+        for line in lines[1:3]:
+            findings.addstr(i, 2, line.split(", ")[0])
+            i += 1
+            if len(line.split(", ")[1]) >= 63:
+                for j in range(0, (len(line.split(", ")[1])//63) + 1):
+                    findings.addstr(i + j, 2, line.split(", ")[1][j*62:(j+1)*62])
+            else:
+                findings.addstr(i, 2, line.split(", ")[1])
+            i += 3
+        findings.addstr(i, 2, "~~ More ~~")
+    else:
+        for line in lines[1:]:
+            findings.addstr(i, 2, line.split(", ")[0])
+            i += 1
+            if len(line.split(", ")[1]) >= 63:
+                for j in range(0, (len(line.split(", ")[1])//63) + 1):
+                    findings.addstr(i + j, 2, line.split(", ")[1][j*62:(j+1)*62])
+            else:
+                findings.addstr(i, 2, line.split(", ")[1])
+            i += 3
+
     objectives.addstr(1, objectives.getmaxyx()[1] // 2 - 5, "Objectives", A_REVERSE)
+    i = 3
+    file = open(f"{projectdir}/objectives.csv","r")
+    lines = file.read().splitlines()
+    file.close()
+    if len(lines) >= 4:
+        for line in lines[1:4]:
+            objectives.addstr(i, 2, line.split(", ")[0])
+            if len(line.split(", ")[1]) > 63:
+                objectives.addstr(i + 1, 2, line.split(", ")[1][:62])
+                objectives.addstr(i + 2, 2, line.split(", ")[1][62:])
+                i += 4
+            else:
+                objectives.addstr(i + 1, 2, line.split(", ")[1])
+                i += 3
+    else:
+        for line in lines[1:]:
+            objectives.addstr(i, 2, line.split(", ")[0])
+            objectives.addstr(i + 1, 2, line.split(", ")[1])
+            i += 3
+
     task.addstr(1, task.getmaxyx()[1] // 2 - 2, "Tasks", A_REVERSE)
+    i = 3
+    file = open(f"{projectdir}/tasks.csv","r")
+    lines = file.read().splitlines()
+    file.close()
+    for line in lines[1:]:
+        if line.split(", ")[2] == "No" or line.split(", ")[2] == "False":
+            task.addstr(i, 2, "<>" + " " + line.split(", ")[0])
+        elif line.split(", ")[2] == "Yes" or line.split(", ")[2] == "True":
+            task.addstr(i, 2, "<~>" + " " + line.split(", ")[0])
+        else:
+            task.addstr(i, 2, line.split(", ")[2] + " " + line.split(", ")[0])
+        task.addstr(i + 1, 2, line.split(", ")[1])
+        i += 3
     #tool.addstr(1, tool.getmaxyx()[1] // 2 - 2, "Tools", A_REVERSE)
     infrastructure.refresh()
     accounts.refresh()

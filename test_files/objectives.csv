@@ -1,0 +1,7 @@
+Goal, Description
+Foothold, Bypass authentication on the web application and gain access to the admin panel.
+Standalone User, Obtain the user flag.
+Standalone Root, Obtain the root flag.
+MS01, Exploit a vulnerable service to gain root access to the machine.
+MS02, Exploit a vulnerable service to gain root access to the machine.
+DC01, Obtain credentials for the domain administrator account.
